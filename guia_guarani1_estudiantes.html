@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ñañemboe Ñane Ñee · Guaraní I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400..600&family=Work+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2B22;
+    --paper:#F1EAD6;
+    --brick:#A9432B;
+    --gold:#C98A2E;
+    --teal:#2F5D57;
+    --teal-light:#5c8b83;
+    --line: rgba(27,43,34,.16);
+    --card: #faf6ea;
+    --shadow: 0 10px 30px -18px rgba(27,43,34,.35);
+    --radius: 14px;
+    --sidebar-w: 260px;
+    --sidebar-w-mid: 92px;
+  }
+  *{box-sizing:border-box;}
+  html, body{ height:100%; margin:0; }
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Work Sans', sans-serif; font-size:16px; line-height:1.55;
+    -webkit-font-smoothing:antialiased; overflow:hidden;
+  }
+  ::selection{ background:var(--gold); color:var(--ink); }
+  h1,h2,h3,h4{ font-family:'Fraunces', serif; font-weight:600; line-height:1.1; margin:0 0 .4em 0; letter-spacing:-.01em; }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:.72rem; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--brick); font-weight:600; display:inline-block; margin-bottom:.7em;
+  }
+  p{margin:0 0 1em 0;}
+  a{color:var(--brick);}
+  svg.icn{ width:19px; height:19px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+
+  .weave{
+    height:8px; flex-shrink:0; border-radius:4px;
+    background:repeating-linear-gradient(
+      90deg, var(--brick) 0 18px, var(--ink) 18px 22px, var(--gold) 22px 30px,
+      var(--paper) 30px 34px, var(--teal) 34px 46px, var(--paper) 46px 50px
+    );
+  }
+  main .weave{ border-radius:0; margin-bottom:0; }
+
+  .app{ display:flex; height:100vh; }
+
+  /* SIDEBAR — always on the left, three responsive tiers */
+  .sidebar{
+    width:var(--sidebar-w); flex-shrink:0; background:var(--ink); color:var(--paper);
+    display:flex; flex-direction:column; overflow-y:auto; overflow-x:hidden;
+    transition:width .2s ease;
+  }
+  .sidebar-brand{ padding:1.5rem 1.3rem .9rem; border-bottom:1px solid rgba(241,234,214,.14); }
+  .sidebar-brand .mark{
+    width:2.4rem; height:2.4rem; border-radius:50%;
+    background:conic-gradient(var(--brick), var(--gold), var(--teal-light), var(--brick));
+    margin-bottom:.7rem;
+  }
+  .sidebar-brand h2{ color:var(--paper); font-size:1.12rem; margin-bottom:.55rem; }
+  .sidebar-brand span{ font-family:'IBM Plex Mono', monospace; font-size:.66rem; opacity:.55; letter-spacing:.05em; }
+  .sidebar-brand .weave{ margin-top:.9rem; }
+
+  .navlist{ list-style:none; margin:0; padding:.7rem; flex:1; }
+  .navbtn{
+    width:100%; text-align:left; background:transparent; border:none; position:relative;
+    color:var(--paper); cursor:pointer; border-radius:10px;
+    padding:.62rem .7rem; margin-bottom:.28rem;
+    display:flex; align-items:flex-start; gap:.65rem;
+    transition:background .15s, transform .1s;
+  }
+  .navbtn::before{
+    content:""; position:absolute; left:0; top:.35rem; bottom:.35rem; width:3px;
+    border-radius:3px; background:transparent; transition:background .15s;
+  }
+  .navbtn:hover{ background:rgba(241,234,214,.08); }
+  .navbtn:active{ transform:scale(.98); }
+  .navbtn.active{ background:rgba(169,67,43,.35); }
+  .navbtn.active::before{ background:var(--gold); }
+  .navbtn .ic{ margin-top:.1rem; opacity:.85; }
+  .navbtn .label{ font-weight:600; font-size:.9rem; display:block; }
+  .navbtn .hint{ font-size:.72rem; opacity:.6; display:block; margin-top:.1rem; font-weight:400; }
+
+  .sidebar-foot{ padding:.9rem 1.3rem 1.3rem; border-top:1px solid rgba(241,234,214,.14); font-size:.76rem; opacity:.7; }
+  .sidebar-foot b{ color:var(--gold); opacity:1; }
+
+  .content{ flex:1; overflow-y:auto; }
+  main{ max-width:900px; margin:0 auto; padding:2.4rem 2rem 2rem; }
+
+  .panel{ display:none; animation:fadein .22s ease; }
+  .panel.active{ display:block; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .hero-inline h1{ font-size:clamp(1.7rem, 3.4vw, 2.5rem); max-width:26ch; }
+  .hero-inline .lede{ font-size:1.03rem; max-width:58ch; color:#33453a; margin-top:.9rem; }
+  .hero-meta{ display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.3rem; }
+  .chip{ font-family:'IBM Plex Mono', monospace; font-size:.7rem; border:1px solid var(--ink); border-radius:30px; padding:.32rem .85rem; color:var(--ink); opacity:.8; }
+
+  .grid{ display:grid; gap:1.1rem; }
+  .grid-2{ grid-template-columns: repeat(2, 1fr); }
+  .grid-3{ grid-template-columns: repeat(3, 1fr); }
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:1.4rem; box-shadow:var(--shadow); transition:transform .15s, box-shadow .15s;
+  }
+  .card:hover{ transform:translateY(-3px); box-shadow:0 16px 34px -16px rgba(27,43,34,.45); }
+  .card h3{font-size:1.03rem;}
+
+  .statement{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:400; font-size:1.3rem; line-height:1.4;
+    color:var(--teal); border-left:4px solid var(--brick); padding-left:1.1rem; margin:1.2rem 0;
+  }
+  .statement b{ font-style:normal; color:var(--brick); font-weight:600;}
+
+  .saberes{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:1rem; }
+  .saber{ border-radius:10px; padding:1rem 1.05rem; font-size:.88rem; transition:transform .15s; }
+  .saber:hover{ transform:translateY(-2px); }
+  .saber h4{ font-family:'IBM Plex Mono', monospace; font-size:.66rem; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.5rem; }
+  .saber.conocer{ background:rgba(47,93,87,.1); border:1px solid rgba(47,93,87,.3);}
+  .saber.conocer h4{color:var(--teal);}
+  .saber.hacer{ background:rgba(169,67,43,.09); border:1px solid rgba(169,67,43,.3);}
+  .saber.hacer h4{color:var(--brick);}
+  .saber.ser{ background:rgba(201,138,46,.12); border:1px solid rgba(201,138,46,.4);}
+  .saber.ser h4{color:#8a601f;}
+  .saber ul{ margin:0; padding-left:1.05rem;}
+  .saber li{margin-bottom:.25rem;}
+
+  .pillbar{ display:flex; flex-wrap:wrap; gap:.5rem; margin:1.2rem 0 1.4rem;}
+  .pill{
+    font-family:'IBM Plex Mono', monospace; font-size:.74rem; border:1px solid var(--teal); color:var(--teal);
+    background:transparent; border-radius:30px; padding:.48rem 1.05rem; cursor:pointer; transition:.15s;
+  }
+  .pill:hover{ background:rgba(47,93,87,.1); }
+  .pill.active{ background:var(--teal); color:var(--paper); }
+  .unit-panel{ display:none; }
+  .unit-panel.active{ display:block; animation:fadein .2s ease; }
+  .unit-head{ display:flex; align-items:baseline; gap:.8rem; margin-bottom:.4rem; }
+  .unit-head .code{ font-family:'IBM Plex Mono', monospace; color:var(--brick); font-size:.83rem; }
+
+  .trail{ position:relative; margin-top:2.2rem; padding-left:2.1rem; }
+  .trail::before{
+    content:""; position:absolute; left:.62rem; top:.4rem; bottom:.4rem; width:3px;
+    background:repeating-linear-gradient(180deg, var(--brick) 0 10px, var(--gold) 10px 20px, var(--teal) 20px 30px);
+    border-radius:3px;
+  }
+  .stop{ position:relative; padding-bottom:2.1rem; }
+  .stop:last-child{padding-bottom:0;}
+  .stop::before{
+    content: attr(data-n); position:absolute; left:-2.1rem; top:0;
+    width:2.3rem; height:2.3rem; background:var(--ink); color:var(--paper);
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:.83rem;
+    box-shadow:0 0 0 5px var(--paper);
+  }
+  .stop h3{ font-size:1.12rem; margin-bottom:.15rem;}
+  .stop .weeks{ font-family:'IBM Plex Mono', monospace; font-size:.7rem; color:var(--brick); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.55rem; display:block; }
+  .stop .deliver{ margin-top:.75rem; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:.85rem 1.05rem; font-size:.89rem; }
+  .stop .deliver b{color:var(--brick);}
+
+  table{ width:100%; border-collapse:collapse; margin-top:1rem; font-size:.89rem;}
+  th, td{ text-align:left; padding:.6rem .72rem; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{ font-family:'IBM Plex Mono', monospace; font-size:.65rem; text-transform:uppercase; letter-spacing:.05em; color:var(--teal); border-bottom:2px solid var(--teal); }
+  tr:hover td{ background:rgba(201,138,46,.06); }
+
+  .scale-row{ display:flex; align-items:flex-start; gap:.7rem; margin-bottom:.75rem;}
+  .dot{ width:12px; height:12px; border-radius:50%; flex-shrink:0; margin-top:.3rem;}
+  .dot.d1{background:#2F5D57;} .dot.d2{background:#5c8b83;} .dot.d3{background:#C98A2E;} .dot.d5{background:#8a7a63;}
+
+  .flipgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:1.2rem; }
+  .flipcard{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:1.25rem; cursor:pointer; box-shadow:var(--shadow); transition:.2s; border-top:4px solid var(--teal);
+  }
+  .flipcard:hover{ transform:translateY(-3px); }
+  .flipcard[data-tipo="sumativa"]{ border-top-color:var(--brick); }
+  .flipcard[data-tipo="continua"]{ border-top-color:var(--gold); }
+  .flipcard h3{ font-size:1rem; display:flex; justify-content:space-between; align-items:center;}
+  .flipcard .hint{ font-family:'IBM Plex Mono', monospace; font-size:.64rem; color:var(--ink); opacity:.45; }
+  .flipcard .tag{ font-family:'IBM Plex Mono', monospace; font-size:.62rem; opacity:.55; display:block; margin-top:.15rem; }
+  .flipcard .detail{ display:none; margin-top:.85rem; padding-top:.85rem; border-top:1px dashed var(--line); font-size:.87rem;}
+  .flipcard.open .detail{ display:block; }
+  .flipcard.open{ box-shadow: 0 14px 34px -16px rgba(27,43,34,.45); }
+
+  .sumbar{ display:flex; align-items:center; gap:.55rem; margin-top:1.5rem; flex-wrap:wrap; font-family:'IBM Plex Mono', monospace; font-size:.76rem; }
+  .sumbar .box{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:.55rem .95rem; text-align:center; }
+  .sumbar .op{ opacity:.5; font-size:1.05rem; }
+  .sumbar .eq{ background:var(--brick); color:var(--paper); border-color:var(--brick); font-weight:600; }
+
+  .term-box{ background:rgba(47,93,87,.08); border:1px solid rgba(47,93,87,.35); border-radius:var(--radius); padding:1.25rem 1.4rem; margin:1.2rem 0; }
+  .term-box h3{ color:var(--teal); font-size:1rem; }
+  .term-map{ display:grid; grid-template-columns:repeat(3,1fr); gap:.85rem; margin-top:1rem; }
+  .term-item{ background:var(--card); border-radius:10px; padding:.85rem .95rem; font-size:.84rem; border:1px solid var(--line); transition:transform .15s; }
+  .term-item:hover{ transform:translateY(-2px); }
+  .term-item .from{ font-family:'IBM Plex Mono', monospace; font-size:.66rem; opacity:.5; text-decoration:line-through;}
+  .term-item .to{ font-family:'IBM Plex Mono', monospace; font-size:.74rem; color:var(--brick); font-weight:600; display:block; margin:.25rem 0;}
+
+  .compare{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1.2rem; }
+  .compare .before, .compare .after{ border-radius:var(--radius); padding:1.2rem 1.3rem; font-size:.87rem; }
+  .compare .before{ background:rgba(169,67,43,.06); border:1px solid rgba(169,67,43,.25); }
+  .compare .after{ background:rgba(47,93,87,.08); border:1px solid rgba(47,93,87,.3); }
+  .compare h4{ font-family:'IBM Plex Mono', monospace; font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.6rem; }
+  .compare .before h4{ color:var(--brick); }
+  .compare .after h4{ color:var(--teal); }
+  .compare ul{ margin:0; padding-left:1.05rem; }
+  .compare li{ margin-bottom:.5rem; }
+
+  .callout{ display:flex; gap:.9rem; background:var(--card); border:1px solid var(--line); border-left:4px solid var(--gold); border-radius:10px; padding:1rem 1.2rem; margin:1.2rem 0; font-size:.89rem; }
+  .callout .ic{ flex-shrink:0; color:var(--gold); margin-top:.15rem; }
+
+  .errores{ background:rgba(169,67,43,.07); border-left:3px solid var(--brick); padding:.85rem 1.05rem; border-radius:8px; margin-top:1.1rem; font-size:.87rem; }
+  .errores b{ color:var(--brick); }
+
+  .badge-row{ display:flex; align-items:center; gap:1rem; padding:.6rem 0; border-bottom:1px dashed var(--line); }
+  .badge-row:last-child{border-bottom:none;}
+  .medal{
+    width:2.4rem; height:2.4rem; border-radius:50%;
+    background:conic-gradient(var(--gold), var(--brick), var(--teal), var(--gold));
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    color:var(--paper); font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:.76rem;
+    box-shadow:inset 0 0 0 3px var(--paper);
+  }
+
+  .progressbar{ display:flex; gap:.3rem; margin-top:1rem; }
+  .progressbar span{ flex:1; height:6px; border-radius:4px; background:rgba(27,43,34,.12); }
+  .progressbar span.done{ background:var(--brick); }
+
+  .biblio{ margin-top:1.2rem; }
+  .biblio li{
+    font-size:.88rem; padding:.85rem 0; border-bottom:1px dashed var(--line);
+    padding-left:1.6em; text-indent:-1.6em; line-height:1.5;
+  }
+  .biblio li:last-child{ border-bottom:none; }
+  .biblio li i{ font-style:italic; }
+
+  .footer-note{
+    margin-top:2.4rem; padding-top:1.5rem; border-top:1px solid var(--line);
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;
+  }
+  .footer-note a.button{ background:var(--brick); color:var(--paper); padding:.68rem 1.25rem; border-radius:8px; text-decoration:none; font-family:'IBM Plex Mono', monospace; font-size:.78rem; transition:transform .15s; }
+  .footer-note a.button:hover{ transform:translateY(-2px); }
+  .footer-note small{ font-family:'IBM Plex Mono', monospace; font-size:.68rem; opacity:.55; }
+
+  /* Tier 2: condensed sidebar (icons + label, no hint) — kicks in before mobile */
+  @media (max-width: 900px){
+    .sidebar{ width:var(--sidebar-w-mid); }
+    .sidebar-brand{ padding:1.1rem .6rem .8rem; text-align:center; }
+    .sidebar-brand h2{ font-size:.72rem; }
+    .sidebar-brand span{ display:none; }
+    .sidebar-brand .mark{ margin:0 auto .6rem; }
+    .navbtn{ flex-direction:column; align-items:center; text-align:center; gap:.3rem; padding:.6rem .3rem; }
+    .navbtn .hint{ display:none; }
+    .navbtn .label{ font-size:.62rem; line-height:1.2; }
+    .navbtn::before{ display:none; }
+    .sidebar-foot{ display:none; }
+  }
+
+  /* Tier 3: true mobile — sidebar becomes a horizontal top bar */
+  @media (max-width: 560px){
+    body{ overflow:auto; }
+    .app{ display:block; height:auto; }
+    .sidebar{
+      width:100%; flex-direction:row; align-items:center;
+      overflow-x:auto; overflow-y:hidden; position:sticky; top:0; z-index:50; height:auto;
+    }
+    .sidebar-brand{ flex-shrink:0; border-bottom:none; padding:.7rem .8rem; }
+    .sidebar-brand .weave{ display:none; }
+    .navlist{ display:flex; padding:.5rem; flex:none; gap:.25rem; }
+    .navbtn{ flex-direction:row; width:auto; white-space:nowrap; }
+    .navbtn .label{ font-size:.72rem; }
+    .content{ overflow-y:visible; }
+    .grid-2, .grid-3, .saberes, .flipgrid, .term-map, .compare{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="mark"></div>
+      <h2>Ñañemboe<br>Ñane Ñee</h2>
+      <span>LAG146 · Guaraní I</span>
+      <div class="weave"></div>
+    </div>
+
+    <ul class="navlist" id="navlist">
+      <li><button class="navbtn active" data-target="inicio">
+        <svg class="icn ic" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
+        <span><span class="label">Inicio</span><span class="hint">Panorama general</span></span></button></li>
+
+      <li><button class="navbtn" data-target="fbc">
+        <svg class="icn ic" viewBox="0 0 24 24"><path d="M4 5.5a3 3 0 0 1 3-1.5h5v15H7a3 3 0 0 0-3 1.5Z"/><path d="M20 5.5a3 3 0 0 0-3-1.5h-5v15h5a3 3 0 0 1 3 1.5Z"/></svg>
+        <span><span class="label">FBC y competencias</span><span class="hint">Qué cambia respecto a antes</span></span></button></li>
+
+      <li><button class="navbtn" data-target="elementos">
+        <svg class="icn ic" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>
+        <span><span class="label">5 elementos</span><span class="hint">Saberes por unidad</span></span></button></li>
+
+      <li><button class="navbtn" data-target="ruta">
+        <svg class="icn ic" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M5 8v4a3 3 0 0 0 3 3h8a3 3 0 0 1 3 3"/></svg>
+        <span><span class="label">Ruta del semestre</span><span class="hint">El camino paso a paso</span></span></button></li>
+
+      <li><button class="navbtn" data-target="evaluacion">
+        <svg class="icn ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.3 11 15l4.8-6"/></svg>
+        <span><span class="label">Evaluación</span><span class="hint">Cómo se califica</span></span></button></li>
+
+      <li><button class="navbtn" data-target="insignias">
+        <svg class="icn ic" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M9 13.5 7.5 21 12 18.5 16.5 21 15 13.5"/></svg>
+        <span><span class="label">Insignias</span><span class="hint">Logros automáticos</span></span></button></li>
+
+      <li><button class="navbtn" data-target="recursos">
+        <svg class="icn ic" viewBox="0 0 24 24"><rect x="3.5" y="8" width="17" height="11" rx="1.5"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <span><span class="label">Recursos</span><span class="hint">Herramientas de apoyo</span></span></button></li>
+
+      <li><button class="navbtn" data-target="practicas">
+        <svg class="icn ic" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6h5.4c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3Z"/></svg>
+        <span><span class="label">Buenas prácticas</span><span class="hint">Para llegar bien al final</span></span></button></li>
+
+      <li><button class="navbtn" data-target="bibliografia">
+        <svg class="icn ic" viewBox="0 0 24 24"><path d="M6 4h9a3 3 0 0 1 3 3v13H8a2 2 0 0 1-2-2Z"/><path d="M6 4v14a2 2 0 0 0 2 2"/></svg>
+        <span><span class="label">Bibliografía</span><span class="hint">Fuentes en formato APA</span></span></button></li>
+    </ul>
+
+    <div class="sidebar-foot">
+      <b>Docente:</b> Carmen Beatriz Zalles Castellanos<br>
+      carmen.zalles@uajms.edu.bo
+    </div>
+  </aside>
+
+  <div class="content" id="content">
+    <div class="weave"></div>
+    <main>
+
+      <section id="inicio" class="panel active">
+        <div class="hero-inline">
+          <span class="eyebrow">Guía del estudiante</span>
+          <h1>Ñañemboe ñane ñee — tu camino para hablar guaraní en la gestión pública del Gran Chaco.</h1>
+          <p class="lede">Esta guía resume qué vas a aprender, cómo se organiza el semestre y cómo se evalúa cada parte de la asignatura. Usa el menú de la izquierda: cada sección cubre una parte distinta de tu recorrido, y puedes saltar directo a la que necesites.</p>
+          <div class="hero-meta">
+            <span class="chip">LAG146 · 1er semestre</span>
+            <span class="chip">4 hrs/semana · 18 semanas</span>
+            <span class="chip">Administración y Gestión Pública</span>
+            <span class="chip">UAJMS · Facultad de Ciencias Empresariales · Yacuiba</span>
+          </div>
+        </div>
+
+        <p style="margin-top:2rem;">El Estado boliviano reconoce 36 idiomas oficiales, y el Estatuto Autonómico Regional del Gran Chaco establece el guaraní, weenhayek y tapiete como idiomas de uso preferente junto al español: todos los documentos oficiales de la región deben poder emitirse también en estas lenguas. Como futura o futuro gestor público del Gran Chaco, el guaraní no es un idioma decorativo: es una herramienta de trabajo.</p>
+
+        <div class="grid grid-3" style="margin-top:1.1rem;">
+          <div class="card">
+            <h3>74 hrs</h3>
+            <p style="margin:0;">de clase con la docente, más 36 horas de aprendizaje autónomo en Moodle.</p>
+          </div>
+          <div class="card">
+            <h3>36 sesiones</h3>
+            <p style="margin:0;">de 2 horas académicas cada una, distribuidas en 18 semanas.</p>
+          </div>
+          <div class="card">
+            <h3>5 unidades</h3>
+            <p style="margin:0;">que avanzan de lo básico (saludos) hasta el debate formal sobre la autonomía guaraní.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="fbc" class="panel">
+        <span class="eyebrow">El modelo pedagógico de la asignatura</span>
+        <h2>¿Qué es la Formación Basada en Competencias?</h2>
+        <p>Guaraní I no se diseñó como una lista de temas de gramática. Se diseñó bajo el enfoque de <b>Formación Basada en Competencias (FBC)</b>, siguiendo el modelo de Tobón (2005). Antes de ver cómo se califica, conviene que entiendas dos palabras clave que vas a leer todo el semestre: <b>competencia</b> y <b>elemento de competencia</b>.</p>
+
+        <div class="grid grid-2" style="margin-top:.4rem;">
+          <div class="card">
+            <h3>¿Qué es una competencia?</h3>
+            <p style="margin:0;">Para Tobón (2005), una competencia es la capacidad de actuar de forma integral ante una situación real, combinando al mismo tiempo tres saberes: <b>saber conocer</b> (la teoría), <b>saber hacer</b> (aplicarla) y <b>saber ser</b> (la actitud con la que lo haces). Saber vocabulario de memoria no es suficiente si no puedes usarlo, ni si lo usas sin respeto intercultural.</p>
+          </div>
+          <div class="card">
+            <h3>¿Qué es un elemento de competencia?</h3>
+            <p style="margin:0;">Es cada una de las partes en que se divide la competencia general de la asignatura para poder trabajarla progresivamente. Guaraní I tiene <b>5 elementos de competencia</b>, uno por unidad — cada uno con su propio saber conocer, saber hacer y saber ser (los verás en detalle en la pestaña "5 elementos").</p>
+          </div>
+        </div>
+
+        <div class="callout">
+          <svg class="icn ic" viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5Z"/><path d="M7 10.5V16c0 1.5 2.2 3 5 3s5-1.5 5-3v-5.5"/></svg>
+          <div>Todo el diseño de la asignatura sigue una misma cadena de coherencia: <b>perfil de egreso del gestor público → competencia de la asignatura → 5 elementos de competencia → dispositivo (Actividad Integradora) → instrumentos de evaluación</b>. Nada se evalúa "porque sí": cada instrumento existe para demostrar un eslabón de esa cadena.</div>
+        </div>
+
+        <h3 style="margin-top:1.8rem;">Lo que realmente cambia frente al modelo tradicional</h3>
+        <p>Esto es, probablemente, lo más importante de entender este semestre:</p>
+        <div class="compare">
+          <div class="before">
+            <h4>Modelo tradicional (fragmentado)</h4>
+            <ul>
+              <li>Nota de examen de gramática, nota de tarea y nota de examen final, cada una por separado.</li>
+              <li>Se acumulan y promedian prácticas y tareas aisladas entre sí.</li>
+              <li>Puedes aprobar el "examen" sin necesariamente poder usar el idioma en una situación real.</li>
+            </ul>
+          </div>
+          <div class="after">
+            <h4>FBC (evaluación global por elemento)</h4>
+            <ul>
+              <li>Cada elemento de competencia (unidad) recibe <b>una sola calificación integrada</b>, no notas sueltas de "examen", "tarea" y "conducta".</li>
+              <li>Esa calificación converge desde tres saberes a la vez: conceptual, procedimental y actitudinal.</li>
+              <li>Se considera lograda la competencia solo si demuestras que sabes, haces y actúas con ella en conjunto — no basta una sola parte.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="statement" style="margin-top:1.6rem;">
+          <b>Aplicas</b> vocabulario en guaraní relacionado con la administración pública del Gran Chaco <b>para interpretar y producir</b> documentos en guaraní en contextos laborales, <b>asegurando</b> precisión lingüística, coherencia comunicativa y respeto intercultural.
+        </div>
+
+        <div class="term-box">
+          <h3>Por qué ya no se dice "examen" ni "evaluación"</h3>
+          <p style="margin:0;">Cada instrumento de Moodle tiene un nombre que corresponde directamente a un saber, no a una categoría administrativa vacía:</p>
+          <div class="term-map">
+            <div class="term-item">
+              <span class="from">"examen de gramática"</span>
+              <span class="to">Desempeño Lingüístico</span>
+              Todo lo <b>conceptual</b>: vocabulario, gramática, pronunciación. El saber conocer.
+            </div>
+            <div class="term-item">
+              <span class="from">"trabajo práctico"</span>
+              <span class="to">Actividad Integradora</span>
+              Todo lo <b>procedimental / pragmático</b>: lo que produces y comunicas. El saber hacer.
+            </div>
+            <div class="term-item">
+              <span class="from">"conducta / participación"</span>
+              <span class="to">Desempeño Sociolingüístico</span>
+              Todo lo <b>actitudinal</b>: cortesía, colaboración, respeto. El saber ser.
+            </div>
+          </div>
+        </div>
+
+        <p>Estos tres nombres corresponden, además, a las tres subcompetencias del Marco Común Europeo de Referencia para las Lenguas:</p>
+        <div class="saberes">
+          <div class="saber conocer">
+            <h4>Lingüística</h4>
+            <p style="margin:0;">En Moodle: <b>Desempeño Lingüístico</b>. Vocabulario, gramática y pronunciación correctas del guaraní boliviano.</p>
+          </div>
+          <div class="saber ser">
+            <h4>Sociolingüística</h4>
+            <p style="margin:0;">En Moodle: <b>Desempeño Sociolingüístico</b>. Cortesía, registros y respeto cultural al hablar.</p>
+          </div>
+          <div class="saber hacer">
+            <h4>Pragmática</h4>
+            <p style="margin:0;">En Moodle: <b>Actividad Integradora</b>. Producir discursos orales y escritos con un propósito comunicativo real.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="elementos" class="panel">
+        <span class="eyebrow">Los cinco elementos de competencia</span>
+        <h2>Qué vas a saber, hacer y ser en cada unidad</h2>
+        <p>Cada unidad del semestre corresponde a un elemento de competencia, evaluado desde tres saberes. Elige una unidad para verla:</p>
+
+        <div class="pillbar" id="unitpills">
+          <button class="pill active" data-unit="u1">Unidad I</button>
+          <button class="pill" data-unit="u2">Unidad II</button>
+          <button class="pill" data-unit="u3">Unidad III</button>
+          <button class="pill" data-unit="u4">Unidad IV</button>
+          <button class="pill" data-unit="u5">Unidad V</button>
+        </div>
+
+        <div class="unit-panel active" id="u1">
+          <div class="unit-head"><h3>Achengetɨ Ñane Ñee Jare Tamaraeme Reta</h3><span class="code">EC 1</span></div>
+          <p>Desarrollas habilidades comunicativas básicas mediante presentaciones y conversaciones simples en un entorno laboral.</p>
+          <div class="saberes">
+            <div class="saber conocer"><h4>Saber conocer</h4><ul>
+              <li>Alfabeto guaraní: vocales, consonantes, ɨ y nasales</li>
+              <li>Saludos: Ñepɨtue y Ñepɨtasoë reta</li>
+              <li>Tamaraeme reta (mañana, mediodía, tarde, noche)</li>
+              <li>Preguntas: Mbaepa, Kiräipa, Kiapepa</li>
+            </ul></div>
+            <div class="saber hacer"><h4>Saber hacer</h4><ul>
+              <li>Presentarte a ti mismo y a otros</li>
+              <li>Describir rutinas en presente</li>
+              <li>Intercambiar información de contacto</li>
+              <li>Preguntar sobre colegas y actividades</li>
+            </ul></div>
+            <div class="saber ser"><h4>Saber ser</h4><ul>
+              <li>Cortesía en las interacciones laborales</li>
+              <li>Colaboración y respeto entre compañeros</li>
+              <li>Apertura intercultural</li>
+            </ul></div>
+          </div>
+        </div>
+
+        <div class="unit-panel" id="u2">
+          <div class="unit-head"><h3>Tembiapo Reta Jare Mbaravɨkɨ Renda</h3><span class="code">EC 2</span></div>
+          <p>Describes habilidades, experiencias y condiciones laborales con vocabulario de empleos.</p>
+          <div class="saberes">
+            <div class="saber conocer"><h4>Saber conocer</h4><ul>
+              <li>Verbos (a)paravɨkɨ y (a)yapo</li>
+              <li>Tembiapo reta: en la calle, comunidad y ciudad</li>
+              <li>Ofisina reta Tëtaguasupe</li>
+              <li>Rasgos de personalidad: ɨpia kavi, oparavɨkɨ vae</li>
+            </ul></div>
+            <div class="saber hacer"><h4>Saber hacer</h4><ul>
+              <li>Escribir un perfil profesional</li>
+              <li>Expresar preferencias sobre empleos</li>
+              <li>Describir tu lugar de trabajo</li>
+              <li>Simular una entrevista laboral entre pares</li>
+            </ul></div>
+            <div class="saber ser"><h4>Saber ser</h4><ul>
+              <li>Profesionalismo y autoevaluación</li>
+              <li>Confianza al describir tu experiencia</li>
+              <li>Respeto por las competencias ajenas</li>
+            </ul></div>
+          </div>
+        </div>
+
+        <div class="unit-panel" id="u3">
+          <div class="unit-head"><h3>Ñane Ñemoña Jare Ñane Rëta</h3><span class="code">EC 3</span></div>
+          <p>Comunicas actividades fuera del trabajo y eventos pasados: familia, hábitos y ocupaciones.</p>
+          <div class="saberes">
+            <div class="saber conocer"><h4>Saber conocer</h4><ul>
+              <li>Sufijo de pasado: ma; sufijos ndive, vaerä, pegua, regua</li>
+              <li>Ñane ñemoña, ñandero, ñande mɨmba reta</li>
+              <li>Ñane rëta y ñandereko</li>
+              <li>Horarios, fechas y citas</li>
+            </ul></div>
+            <div class="saber hacer"><h4>Saber hacer</h4><ul>
+              <li>Hablar de actividades con adverbios de frecuencia</li>
+              <li>Relatar eventos pasados familiares y laborales</li>
+              <li>Organizar eventos en una línea de tiempo</li>
+            </ul></div>
+            <div class="saber ser"><h4>Saber ser</h4><ul>
+              <li>Autonomía al hablar de compromisos</li>
+              <li>Precisión al relatar el pasado</li>
+              <li>Respeto por la memoria histórica guaraní</li>
+            </ul></div>
+          </div>
+        </div>
+
+        <div class="unit-panel" id="u4">
+          <div class="unit-head"><h3>Ñande Rete Jare Mbaerasɨ</h3><span class="code">EC 4</span></div>
+          <p>Expresas opiniones y preocupaciones sobre salud y seguridad, con cortesía en el lugar de trabajo.</p>
+          <div class="saberes">
+            <div class="saber conocer"><h4>Saber conocer</h4><ul>
+              <li>Perífrasis verbal con (a)ï</li>
+              <li>Ñande rete iñemboyao (cuerpo) y Mbaerasɨ (enfermedades)</li>
+              <li>Moa (remedios) y Ñepoanoarenda (centro de salud)</li>
+              <li>Teko roïsa Tëtagasupe: bienestar en la gestión pública</li>
+            </ul></div>
+            <div class="saber hacer"><h4>Saber hacer</h4><ul>
+              <li>Hablar de planes con presente continuo</li>
+              <li>Dar opiniones con cortesía y manejar desacuerdos</li>
+              <li>Dar sugerencias de salud y seguridad laboral</li>
+            </ul></div>
+            <div class="saber ser"><h4>Saber ser</h4><ul>
+              <li>Cortesía al opinar y discrepar</li>
+              <li>Responsabilidad sobre el bienestar laboral</li>
+              <li>Sensibilidad intercultural en salud comunitaria</li>
+            </ul></div>
+          </div>
+        </div>
+
+        <div class="unit-panel" id="u5">
+          <div class="unit-head"><h3>Mborokuai Tëtapiapotaaregua Kooguasu Iiviapirupi</h3><span class="code">EC 5</span></div>
+          <p>Te comunicas en guaraní formal sobre el Estatuto Autonómico Regional del Gran Chaco y el Kereimba Iyambae.</p>
+          <div class="saberes">
+            <div class="saber conocer"><h4>Saber conocer</h4><ul>
+              <li>Prefijos, infijos y sufijos verbales</li>
+              <li>Tëtaguasu, Tëtamiatɨ jare Tëtami (Estado, Nación, Pueblo)</li>
+              <li>Meteia y Mokoia Ñemboyao (artículos del Estatuto)</li>
+              <li>Kereimba Iyambae: libre determinación guaraní</li>
+            </ul></div>
+            <div class="saber hacer"><h4>Saber hacer</h4><ul>
+              <li>Usar vocabulario formal para describir el Estatuto</li>
+              <li>Formular y responder preguntas sobre el Kereimba Iyambae</li>
+              <li>Entregar Ñeemiari Reta: video grupal en guaraní</li>
+            </ul></div>
+            <div class="saber ser"><h4>Saber ser</h4><ul>
+              <li>Respeto por la cultura y lengua guaraní</li>
+              <li>Actitud inclusiva en el lenguaje formal</li>
+              <li>Compromiso con la gestión pública intercultural</li>
+            </ul></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ruta" class="panel">
+        <span class="eyebrow">El dispositivo pedagógico</span>
+        <h2>Un solo camino comunicativo, cinco paradas</h2>
+        <p>La Actividad Integradora no son cinco tareas sueltas: es un mismo camino que empieza en la Sesión 1 y termina en la Sesión 36. Cada parada usa lo que aprendiste en la anterior y te acerca a Ñeemiari Reta —"diálogos"—, la meta final del semestre.</p>
+
+        <div class="trail">
+          <div class="stop" data-n="1">
+            <span class="weeks">Semanas 1–4 · Sesiones 1–8</span>
+            <h3>Parte 1 — Mi presentación personal</h3>
+            <p style="margin:0;">Aprendes el alfabeto, los saludos según el momento del día y a preguntar por colegas y actividades.</p>
+            <div class="deliver"><b>Entregas:</b> audio de presentación + tarjeta de presentación + diálogo simulado, con rúbrica visible en Moodle. Consigues la insignia <i>Nivel Inicial</i>.</div>
+          </div>
+          <div class="stop" data-n="2">
+            <span class="weeks">Semanas 5–8 · Sesiones 9–16</span>
+            <h3>Parte 2 — Mi ocupación y lugar de trabajo</h3>
+            <p style="margin:0;">Describes tus habilidades, tu oficina y simulas una entrevista laboral en guaraní.</p>
+            <div class="deliver"><b>Entregas:</b> audio/video de entrevista + ficha personal + perfil laboral. Consigues la insignia <i>Nivel Básico</i>.</div>
+          </div>
+          <div class="stop" data-n="3">
+            <span class="weeks">Semanas 9–11 · Sesiones 17–22</span>
+            <h3>Parte 3 — Mi familia y mis hábitos</h3>
+            <p style="margin:0;">Narras eventos pasados y hábitos usando el sufijo de pasado <i>ma</i> y los sufijos de relación.</p>
+            <div class="deliver"><b>Entregas:</b> narración oral/escrita + línea de tiempo + calendario de actividades. Consigues la insignia <i>Nivel Autónomo</i>.</div>
+          </div>
+          <div class="stop" data-n="4">
+            <span class="weeks">Semanas 12–14 · Sesiones 23–28</span>
+            <h3>Parte 4 — Mi salud</h3>
+            <p style="margin:0;">Das opiniones y sugerencias sobre salud y seguridad laboral con la perífrasis <i>(a)ï</i>.</p>
+            <div class="deliver"><b>Entregas:</b> conversatorio grupal grabado + infografía + diálogos simulados. Consigues la insignia <i>Nivel Estratégico</i>.</div>
+          </div>
+          <div class="stop" data-n="5">
+            <span class="weeks">Semanas 15–18 · Sesiones 29–36</span>
+            <h3>Ñeemiari Reta — Actividad Integradora final</h3>
+            <p style="margin:0;">Eliges un tema —Educación, Salud, Economía, Cultura, Medioambiente, Familia o Trabajo— y lo relacionas con el Estatuto Regional del Gran Chaco y/o el Kereimba Iyambae.</p>
+            <div class="deliver"><b>Entregas:</b> participación en el foro-debate + video mp4 grupal de 2 a 4 minutos en guaraní formal. Consigues las insignias <i>Nivel Experto</i> y, si completaste todo el camino, <i>Nivel Legendario</i>.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="evaluacion" class="panel">
+        <span class="eyebrow">Cómo se evalúa tu aprendizaje</span>
+        <h2>Una sola calificación por elemento de competencia</h2>
+        <p>Cada unidad vale <b>20%</b> de tu nota final (5 unidades × 20% = 100%). Como viste en "FBC y competencias", ese 20% <b>no se separa en notas sueltas de examen, tarea y conducta</b>: se construye integrando tres momentos de evaluación que, juntos, demuestran si lograste el elemento de competencia completo.</p>
+
+        <div class="callout">
+          <svg class="icn ic" viewBox="0 0 24 24"><path d="M12 8v5"/><circle cx="12" cy="16" r=".6"/><circle cx="12" cy="12" r="9"/></svg>
+          <div><b>Antes de la Unidad 1:</b> en la Sesión 1 se aplica una evaluación diagnóstica oral/escrita. No tiene fines calificativos — solo orienta a la docente sobre tu punto de partida con el guaraní.</div>
+        </div>
+
+        <p>Dentro de cada unidad, hay tres momentos con nombre propio en Tabla de evaluación de Moodle. Haz clic en cada tarjeta para ver el detalle:</p>
+
+        <div class="flipgrid" id="flipgrid">
+          <div class="flipcard" data-tipo="formativa">
+            <h3>Formativa <span class="hint">ver +</span></h3>
+            <span class="tag">→ Saber Conceptual</span>
+            <p style="margin:.5rem 0 0;">Acompaña el proceso, unidad por unidad.</p>
+            <div class="detail">
+              <p style="margin:0 0 .6rem;">Corresponde al <b>Desempeño Lingüístico</b>: los cuestionarios de VOCABULARIO, ORACIONES y DESEMPEÑO LINGÜÍSTICO.</p>
+              <p style="margin:0;">Tiene retroalimentación automática e inmediata y puedes repetir tus intentos sin que uno fallido te perjudique. Pero atención: <b>el resultado sí tiene ponderación</b>. No es un ejercicio "gratis" — su nota se suma dentro del 20% de la unidad, igual que las otras dos.</p>
+            </div>
+          </div>
+          <div class="flipcard" data-tipo="sumativa">
+            <h3>Sumativa <span class="hint">ver +</span></h3>
+            <span class="tag">→ Saber Procedimental</span>
+            <p style="margin:.5rem 0 0;">Cierra la unidad con una producción real.</p>
+            <div class="detail">
+              <p style="margin:0 0 .6rem;">Corresponde a la <b>Actividad Integradora</b> (Partes 1 a 4 y Ñeemiari Reta): el foro de audio y, en la unidad final, el video mp4.</p>
+              <p style="margin:0;">Se evalúa con rúbrica visible <b>antes</b> de que hagas la actividad. Es un solo intento por parte, así que se prepara con anticipación.</p>
+            </div>
+          </div>
+          <div class="flipcard" data-tipo="continua">
+            <h3>Integral continua <span class="hint">ver +</span></h3>
+            <span class="tag">→ Saber Actitudinal</span>
+            <p style="margin:.5rem 0 0;">Se registra a lo largo de toda la unidad.</p>
+            <div class="detail">
+              <p style="margin:0 0 .6rem;">Corresponde al <b>Desempeño Sociolingüístico</b>: tu actitud intercultural, colaboración y cortesía.</p>
+              <p style="margin:0;">No se mide en un solo momento puntual, sino sesión a sesión, en cada foro y actividad grupal. También forma parte del puntaje de la unidad.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="sumbar">
+          <div class="box">Formativa</div><span class="op">+</span>
+          <div class="box">Sumativa</div><span class="op">+</span>
+          <div class="box">Integral continua</div><span class="op">=</span>
+          <div class="box eq">20% · una sola nota del elemento</div>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Instrumento</th><th>Qué evalúa</th><th>Momento</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Módulo de lección + cuestionarios<br><span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:#7a7060;">VOCABULARIO · ORACIONES · DESEMPEÑO LINGÜÍSTICO</span></td>
+              <td>Tu dominio del vocabulario y la gramática de la unidad (saber conceptual).</td>
+              <td>Formativa</td>
+            </tr>
+            <tr>
+              <td>Actividad Integradora (Partes 1–4) / Ñeemiari Reta</td>
+              <td>Tu producción comunicativa real: foro de audio, video (saber procedimental / pragmático).</td>
+              <td>Sumativa</td>
+            </tr>
+            <tr>
+              <td>Desempeño Sociolingüístico</td>
+              <td>Tu actitud: cortesía intercultural, colaboración, respeto por la diversidad (saber actitudinal).</td>
+              <td>Integral continua</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:1.9rem;">La escala de calificación</h3>
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="scale-row"><span class="dot d1"></span><div><b>80–100 %</b> · Logrado con distinción</div></div>
+            <div class="scale-row"><span class="dot d2"></span><div><b>60–79 %</b> · Logrado</div></div>
+            <div class="scale-row"><span class="dot d3"></span><div><b>40–59 %</b> · Logrado Regular <span style="opacity:.7;">(acceso a mesas de examen)</span></div></div>
+            <div class="scale-row"><span class="dot d5"></span><div><b>0–39 %</b> · En proceso de logro <span style="opacity:.7;">(no se exporta a Tariquia)</span></div></div>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">Ojo con la libreta condicional</h3>
+            <p style="margin:0;">Si una sola unidad se queda <b>en proceso de logro</b> (por debajo del 40%) o sin nota registrada, esa unidad no se exporta a Tariquia y <b>el promedio final del curso no se genera automáticamente</b>. Completa las cinco unidades: no hay atajos.</p>
+          </div>
+        </div>
+
+        <h3 style="margin-top:1.9rem;">Cómo se evalúa cada Actividad Integradora</h3>
+        <p>Las cinco rúbricas (Partes 1 a 4 y Ñeemiari Reta) comparten la misma lógica: 5 competencias, 20 puntos cada una, 100 puntos en total.</p>
+        <div class="grid grid-2" style="margin-top:1rem;">
+          <div class="card">
+            <h3 style="font-size:1rem;">Las 5 competencias de la rúbrica</h3>
+            <p style="margin:0;"><b>C1</b> Dominio de los contenidos de la unidad · <b>C2</b> Expresión oral e interacción en el foro · <b>C3</b> Pronunciación y fluidez · <b>C4</b> Vocabulario y gramática · <b>C5</b> Calidad de la producción audiovisual.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">La condición para finalizar</h3>
+            <p style="margin:0;">En cada parte debes publicar <b>2 preguntas</b> (en un tema distinto al de un compañero) y responder <b>2 preguntas de 2 compañeros diferentes</b> sobre temas distintos entre sí. En Ñeemiari Reta, además, el video mp4 es obligatorio.</p>
+          </div>
+        </div>
+
+        <div class="errores">
+          <b>Errores frecuentes que bajan tu calificación</b> — publicar tu pregunta en el mismo tema que ya usó un compañero; responder dos veces la misma pregunta en lugar de dos preguntas distintas; hacer dos preguntas casi idénticas; entregar audio con ruido excesivo o video sin relación con el tema de la unidad; y mezclar español y guaraní en la misma oración cuando se pide guaraní formal.
+        </div>
+      </section>
+
+      <section id="insignias" class="panel">
+        <span class="eyebrow">Gamificación</span>
+        <h2>El sistema de insignias</h2>
+        <p>Cada insignia se otorga automáticamente en Moodle al cumplir los criterios de la unidad. Son permanentes en tu perfil y puedes compartirlas.</p>
+        <div class="progressbar">
+          <span class="done"></span><span class="done"></span><span class="done"></span><span></span><span></span><span></span>
+        </div>
+        <div class="card" style="margin-top:1.1rem;">
+          <div class="badge-row"><div class="medal">C1</div><div><b>Nivel Inicial</b> — completar lección, vocabulario, oraciones y desempeño lingüístico de la Unidad 1.</div></div>
+          <div class="badge-row"><div class="medal">C2</div><div><b>Nivel Básico</b> — aprobar la Actividad Integradora Parte 1 (mínimo 40 pts).</div></div>
+          <div class="badge-row"><div class="medal">C3</div><div><b>Nivel Autónomo</b> — aprobar las Partes 1 y 2.</div></div>
+          <div class="badge-row"><div class="medal">C4</div><div><b>Nivel Estratégico</b> — aprobar las Partes 1, 2 y 3.</div></div>
+          <div class="badge-row"><div class="medal">C5</div><div><b>Nivel Experto</b> — aprobar las Partes 1, 2, 3 y 4.</div></div>
+          <div class="badge-row"><div class="medal" style="background:conic-gradient(var(--brick),var(--gold),var(--teal),var(--brick),var(--gold));">C6</div><div><b>Nivel Legendario</b> — la insignia máxima: obtener C1 a C5 y aprobar Ñeemiari Reta con mínimo 40 pts.</div></div>
+        </div>
+      </section>
+
+      <section id="recursos" class="panel">
+        <span class="eyebrow">Tu caja de herramientas</span>
+        <h2>Todo vive en el aula Moodle</h2>
+        <p><a href="https://aula.uajms.edu.bo" target="_blank" rel="noopener">aula.uajms.edu.bo</a> es el punto de partida de cada sesión. Ahí encuentras:</p>
+        <div class="grid grid-3">
+          <div class="card">
+            <h3 style="font-size:1rem;">Guía Didáctica (Genially)</h3>
+            <p style="margin:0;">El mapa del semestre: elementos de competencia, unidades, canales de contacto y el documental <i>El Pueblo Guaraní</i>.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">Diccionario Ñee reta Mboriviapegua</h3>
+            <p style="margin:0;">Diccionario guaraní-español con buscador, vocal gutural (ɨ) y ejemplos de uso. Disponible en todos los bloques.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">Portafolio de evidencias</h3>
+            <p style="margin:0;">En cada bloque: verifica de un vistazo qué te falta completar en la unidad.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">Apps complementarias</h3>
+            <p style="margin:0;">H5P y Liveworksheets para practicar; App <i>Lenguas de Bolivia</i> y App <i>NuSimi</i> para reforzar pronunciación.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">Libreta de calificaciones</h3>
+            <p style="margin:0;">Consulta tu avance en tiempo real, organizado por elemento de competencia.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">Materiales de referencia</h3>
+            <p style="margin:0;">Schuchard (1979), Peralta (1999) y el Estatuto Autonómico Regional del Gran Chaco (2016), traducido al guaraní.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="practicas" class="panel">
+        <span class="eyebrow">Antes de empezar</span>
+        <h2>Buenas prácticas para llegar bien a Ñeemiari Reta</h2>
+        <div class="grid grid-2">
+          <div class="card">
+            <h3 style="font-size:1rem;">1. Lee la rúbrica antes de grabar</h3>
+            <p style="margin:0;">Todas las rúbricas están visibles en Moodle antes de cada entrega. Revísala primero: te dice exactamente qué se espera de vos.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">2. No repitas el módulo de lección al final</h3>
+            <p style="margin:0;">Puedes repetirlo tantas veces como quieras antes de los cuestionarios: úsalo durante la semana, no la noche anterior.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">3. En el foro, elige un tema distinto</h3>
+            <p style="margin:0;">Antes de publicar tu pregunta, revisa qué temas ya usaron tus compañeros. Repetir tema es el error más común.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">4. Cuida el audio, no la perfección</h3>
+            <p style="margin:0;">Un audio claro y sin ruido vale más que un discurso perfecto pero inaudible. Grábate en un lugar tranquilo.</p>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;">5. Ñeemiari Reta se prepara desde la Semana 1</h3>
+            <p style="margin:0;">Cada parte te da el vocabulario que necesitarás en la siguiente. Guarda tus entregas anteriores: son tu banco de frases para el video final.</p>
+          </div>
+          <div class="card" style="background:var(--teal); border:none;">
+            <h3 style="font-size:1rem; color:var(--paper);">Recuerda</h3>
+            <p style="margin:0; color:var(--paper);">Docente: Carmen Beatriz Zalles Castellanos — carmen.zalles@uajms.edu.bo</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="bibliografia" class="panel">
+        <span class="eyebrow">Referencias</span>
+        <h2>Bibliografía (formato APA)</h2>
+        <p>Estas son las fuentes que sustentan el diseño de la asignatura y que se mencionan a lo largo de esta guía.</p>
+        <ul class="biblio">
+          <li>Centro de Investigación y Promoción del Campesinado [CIPCA]. (2020). <i>Se aprobó el Estatuto de Autonomía Indígena Guaraní «Kereimba Iyambae»</i>. CIPCA. https://cipca.org.bo</li>
+          <li>Constitución Política del Estado Plurinacional de Bolivia [CPE]. (2009). <i>Constitución Política del Estado Plurinacional de Bolivia</i>. Gaceta Oficial del Estado Plurinacional de Bolivia.</li>
+          <li>Consejo de Europa. (2001). <i>Marco Común Europeo de Referencia para las Lenguas: aprendizaje, enseñanza, evaluación</i> [MCER]. Anaya.</li>
+          <li>Delors, J. (Coord.). (1996). <i>La educación encierra un tesoro: Informe a la UNESCO de la Comisión Internacional sobre la Educación para el Siglo XXI</i>. Santillana/UNESCO.</li>
+          <li>Gobierno Autónomo Regional del Gran Chaco [GARCH]. (2016). <i>Estatuto Autonómico Regional del Gran Chaco Tarijeño</i>. Órgano Electoral Plurinacional. https://web.oep.org.bo/wp-content/uploads/2016/12/gran_chaco.pdf</li>
+          <li>Melià, B. (1988). <i>Los Guaraní-Chiriguano 1: Ñande Reko. Nuestro modo de ser</i> (Cuadernos de Investigación N.° 30). CIPCA.</li>
+          <li>Ministerio de Justicia. (2000). <i>Aipota aiko chepiaguive cheyambae</i> [Quiero vivir libre]. COSUDE.</li>
+          <li>Organización para la Cooperación y el Desarrollo Económicos [OCDE]. (2005). <i>La definición y selección de competencias clave: Resumen ejecutivo</i>. OCDE. https://www.oecd.org/pisa/35070367.pdf</li>
+          <li>Peralta, J. (1999). <i>Diccionario guaraní-español</i>. Editorial del Autor.</li>
+          <li>Schuchard, B. (1979). <i>Ñane Ñee</i> [Nuestra lengua]. Editorial Oriente.</li>
+          <li>Tobón, S. (2005). <i>Formación basada en competencias: Pensamiento complejo, diseño curricular y didáctica</i> (2.ª ed.). Ecoe Ediciones.</li>
+          <li>Universidad Autónoma Juan Misael Saracho [UAJMS]. (2025). <i>Proyecto formativo: Guaraní I – LAG146 y aula virtual Moodle</i>. Carrera de Administración y Gestión Pública. https://aula.uajms.edu.bo</li>
+        </ul>
+      </section>
+
+      <div class="footer-note">
+        <small>Guaraní I · LAG146 · Carrera de Administración y Gestión Pública · UAJMS, Facultad de Ciencias Empresariales, Sede Yacuiba</small>
+        <a class="button" href="https://aula.uajms.edu.bo" target="_blank" rel="noopener">Ir al aula Moodle →</a>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  const navbtns = document.querySelectorAll('.navbtn');
+  const panels = document.querySelectorAll('.panel');
+  const contentEl = document.getElementById('content');
+  navbtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      navbtns.forEach(b => b.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).classList.add('active');
+      contentEl.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+
+  const pills = document.querySelectorAll('#unitpills .pill');
+  const unitPanels = document.querySelectorAll('.unit-panel');
+  pills.forEach(p => {
+    p.addEventListener('click', () => {
+      pills.forEach(x => x.classList.remove('active'));
+      unitPanels.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      document.getElementById(p.dataset.unit).classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.flipcard').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('open'));
+  });
+</script>
+
+</body>
+</html>
